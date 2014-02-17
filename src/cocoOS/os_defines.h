@@ -59,12 +59,12 @@
 
 /** Max number of used tasks
 * @remarks Must be defined. @n Allowed range: 0-254. Value must not be exceeded */
-#define N_TASKS             4
+#define N_TASKS             10
 
 
 /** Max number of used message queues
 * @remarks Must be defined. @n Allowed range: 0-254. Value must not be exceeded */
-#define N_QUEUES            0
+#define N_QUEUES            2
 
 
 /** Max number of used semaphores
@@ -74,11 +74,11 @@
 
 /** Max number of used events
 * @remarks Must be defined. @n Allowed range: 0-254. Value must not be exceeded */
-#define N_EVENTS            1
+#define N_EVENTS            5
 
 
 /** Round Robin scheduling
 * @remarks If defined, tasks will be scheduled ignoring the priorities */
-#define ROUND_ROBIN
+//#define ROUND_ROBIN
 
 #endif

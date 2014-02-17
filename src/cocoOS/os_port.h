@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 Peter Eckstrand
+ * Copyright (c) 2012 Peter Eckstrand, 2014 Gregory Davill
  *
  * All rights reserved.
  *
@@ -31,6 +31,8 @@
  *
  * This file is part of the cocoOS operating system.
  * Author: Peter Eckstrand <info@cocoos.net>
+ *
+ * Moddification to MSP430 by Greg Davill <greg.davill@gmail.com>
  */
  
 /***************************************************************************************
@@ -39,14 +41,15 @@
     Change log:
     2010-11-13: First version
     2012-01-04: Released under BSD license.
+    2014-02-14: [Gregory Davill] Changed file to support MSP430 instead of AVR
 
 ***************************************************************************************
 */
 #ifndef OS_PORT_H_
 #define OS_PORT_H_
 
-#include <interrupt.h>
-#define os_enable_interrupts()	sei()
-#define os_disable_interrupts()	cli()
+#include <msp430.h>
+#define os_enable_interrupts()	__bis_SR_register(GIE)
+#define os_disable_interrupts()	__bic_SR_register(GIE)
 
 #endif

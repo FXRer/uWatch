@@ -10,8 +10,7 @@ TARGET = build/$(PROJECT).elf
 CC = msp430-gcc
 
 MSPDEBUG = mspdebug
-PROGFLAGS = rf2500 'opt fet_block_size 512' 
-
+PROGFLAGS = rf2500
 
 ## MCU to pass to the linker
 MCU = msp430fr5739
@@ -28,7 +27,7 @@ ASMFLAGS := -x assembler-with-cpp
 LDFLAGS = -mmcu=$(MCU) -Wl,--relax
 
 
-SRC_DIR   := cocoOS drivers
+SRC_DIR   := cocoOS drivers tasks
 BUILD_DIR := build 
 
 ## Do not edit below this line.
@@ -36,7 +35,8 @@ BUILD_DIR := build
 
 SRC_A       := $(wildcard src/*.c)
 SRC_A 	  += $(wildcard src/cocoOS/*.c)
-SRC_A 	  += $(wildcard src/driver/*.c)
+SRC_A 	  += $(wildcard src/drivers/*.c)
+SRC_A 	  += $(wildcard src/tasks/*.c)
 
 SRC       := $(patsubst src/%.c,%.c,$(SRC_A))
 
@@ -51,6 +51,7 @@ OBJ     = $(OBJ_A:%.o=build/%.o)
 
 DEP	  := $(OBJ:%.o=%.d)
 INCLUDES  := $(addprefix -I,$(SRC_DIR))
+INCLUDES += -I.
 
 
 
@@ -60,6 +61,7 @@ all: checkdirs $(OBJ) $(TARGET) size
 
 checkdirs: 
 	@mkdir -p build
+	@mkdir -p build/tasks
 	@mkdir -p build/cocoOS
 	@mkdir -p build/drivers
 

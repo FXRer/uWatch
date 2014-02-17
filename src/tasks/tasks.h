@@ -5,5 +5,6 @@
 
 #include "buzzer.h"
 #include "buttons.h"
+#include "home.h"
 
 #endif
