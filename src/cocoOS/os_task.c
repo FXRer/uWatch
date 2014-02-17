@@ -792,3 +792,7 @@ static void task_waiting_event_timeout_set( tcb *task ) {
 static void task_killed_set( uint8_t tid ) {
     task_list[ tid ].state = KILLED;
 }
+
+tcb** task_get_list(void){
+	return task_list;
+}
