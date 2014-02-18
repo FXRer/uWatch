@@ -75,10 +75,10 @@ void lcd_xmit(void)
 	
 	UCB0TXBUF = 0x80; // start DMA xfer
 	
-	
-	P2OUT ^= BIT3;
+	P2OUT ^= LCD_EXTC;
 	
 	while((DMAIFG & DMA0CTL) == 0);
+	
 	
 	DMACTL0 = 0;
 	
@@ -123,6 +123,20 @@ void clear(int _x, int _y, int _w, int _h)
 	}	
 }
 
+void plotCircle(int xm, int ym, int r)
+{
+   int x = -r, y = 0, err = 2-2*r;                /* bottom left to top right */
+   do {                                          
+      setPixel(xm-x, ym+y, 1);                            /*   I. Quadrant +x +y */
+      setPixel(xm-y, ym-x, 1);                            /*  II. Quadrant -x +y */
+      setPixel(xm+x, ym-y, 1);                            /* III. Quadrant -x -y */
+      setPixel(xm+y, ym+x, 1);                            /*  IV. Quadrant +x -y */
+      r = err;                                   
+      if (r <= y) err += ++y*2+1;                             /* e_xy+e_y < 0 */
+      if (r > x || err > y)                  /* e_xy+e_x > 0 or no 2nd y-step */
+         err += ++x*2+1;                                     /* -> x-step now */
+   } while (x < 0);
+}
 
 
 int x,y;
@@ -133,6 +147,46 @@ void setxy(int _x, int _y)
 	x = _x;
 	y = _y;
 }
+
+
+void plotLine(int x0, int y0, int x1, int y1)
+{
+   int dx =  abs(x1-x0), sx = x0<x1 ? 1 : -1;
+   int dy = -abs(y1-y0), sy = y0<y1 ? 1 : -1;
+   int err = dx+dy, e2;                                   /* error value e_xy */
+                                                    
+   for (;;){                                                          /* loop */
+      setPixel(x0,y0, 1);                              
+      e2 = 2*err;                                   
+      if (e2 >= dy) {                                         /* e_xy+e_x > 0 */
+         if (x0 == x1) break;                       
+         err += dy; x0 += sx;                       
+      }                                             
+      if (e2 <= dx) {                                         /* e_xy+e_y < 0 */
+         if (y0 == y1) break;
+         err += dx; y0 += sy;
+      }
+   }
+}
+
+
+
+void setPixel(int _x, int _y, char b)
+{
+	if(_y > Y || _x > X || _x < 0 || _y < 0)
+		return;
+
+	int xloc = ((_y*(X/8+2)))+_x/8+1;
+	int shift = (_x % 8);
+
+	char *ptr = (char*)_buffer;
+
+	if (b)
+		ptr[xloc] &= ~(0x80 >> shift);
+	else
+		ptr[xloc] |= (0x80 >> shift);
+}
+
 
 
 //TODO: make this function smaller/more efficient

@@ -33,12 +33,14 @@
  */
  
 #include <msp430.h> 
-#include "home.h"
+#include "analog.h"
 #include "../drivers/lcd.h"
 #include "../xprint.h"
 
 
-const signed char tab[] = {0x28,0x27,0x27,0x26,0x24,0x22,0x20,0x1D,
+// x = [0:60], y = sin(x*2pi/60) * 40;
+const signed char sine_table[] = {
+0x28,0x27,0x27,0x26,0x24,0x22,0x20,0x1D,
 0x1A,0x17,0x14,0x10,0x0C,0x08,0x04,0x00,
 0xFC,0xF8,0xF4,0xF0,0xED,0xE9,0xE6,0xE3,
 0xE0,0xDE,0xDC,0xDA,0xD9,0xD9,0xD9,0xD9,
@@ -49,7 +51,7 @@ const signed char tab[] = {0x28,0x27,0x27,0x26,0x24,0x22,0x20,0x1D,
 
 static int hour,minute;
 
-void home_task(void)
+void analog_task(void)
 {
 
 	task_open();
@@ -57,16 +59,17 @@ void home_task(void)
 	while(1)
 	{
 		clearBuff();
-		setxy(2,4);
-		
-		xprint("%02u:%02u",hour,minute); 
+		setxy(1,4);
+		xprint(" Analog Watch\n"); 
+		xprint("   %02u:%02u",hour,minute); 
 		
 		plotCircle(48,48,44);
 		
-		plotLine(48, 48, 48-tab[minute], 48 + tab[(15+minute)%60]);
+		
+		plotLine(48, 48, 48-sine_table[minute], 48 + sine_table[(15+minute)%60]);
 		
 		
-		plotLine(48, 48, 48-(tab[hour*5+ minute/12]>>1), 48 + (tab[(15+hour*5 + minute/12)%60]>>1));
+		plotLine(48, 48, 48-(sine_table[hour*5+ minute/12]>>1), 48 + (sine_table[(15+hour*5 + minute/12)%60]>>1));
 		
 		
 		lcd_xmit();

@@ -12,5 +12,6 @@
 extern char _buffer[96*14];
 
 void lcd_xmit(void);
+void putc(char d);
 
 #endif

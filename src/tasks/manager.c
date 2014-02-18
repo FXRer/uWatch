@@ -34,6 +34,7 @@
 
 
 #include "manager.h"
+#include "../xprint.h"
 
 // desc, a simple task manager. is infact a task in itself. 
 
@@ -41,24 +42,35 @@
 void manager_task(void)
 {
 	int i;
+	static int selected;
 	task_open();
-	
+	selected = 0;
 	while(1)
 	{
 		// get list of running tasks
 		
 		tcb** tasks = task_get_list();
+		// small preamble
+		setxy(1,1);
+		xprint(" Tid  prio  time\n");
 		
 		// display the list
-		for(i = 0; i < N_TASKS; i++)
+		for(i = 0; i < 4; i++)
 		{
-			tcb* t = tasks[i]; // do something with this information
+			tcb *t = tasks[i]; // do something with this information
+		
+			xprint("%c%u %u %04X\n",selected == i ? '>' : '-',t,0,0);
 			
 		}
 		
 		
+		// display this result.
+		lcd_xmit();
+		
 		// take input of some kind
 		event_wait( buttonEvent );
+		
+		selected++;
 	}
 	
 	task_close();

@@ -6,5 +6,7 @@
 #include "buzzer.h"
 #include "buttons.h"
 #include "home.h"
+#include "manager.h"
+#include "analog.h"
 
 #endif

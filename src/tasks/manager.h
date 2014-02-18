@@ -4,4 +4,6 @@
 #include "../cocoOS/cocoos.h"
 #include "tasks.h"
 
+void manager_task(void);
+
 #endif

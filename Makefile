@@ -21,7 +21,7 @@ MCU = msp430fr5739
 CFLAGS := -Wall -Os -mmcu=$(MCU)
 
 ## Assembly flags
-ASMFLAGS := -x assembler-with-cpp
+ASMFLAGS := -x assembler-with-cpp -mmcu=$(MCU)
 
 ## Linker flags
 LDFLAGS = -mmcu=$(MCU) -Wl,--relax
@@ -41,9 +41,9 @@ SRC_A 	  += $(wildcard src/tasks/*.c)
 SRC       := $(patsubst src/%.c,%.c,$(SRC_A))
 
 
-#ASM       := $(foreach adir,$(SRC_DIR),$(wildcard src/$(adir)/*.s))
+ASM       := xprint.s
 
-#ASM_OBJ	  := $(patsubst src/%.s,build/%.o,$(ASM))
+ASM_OBJ	  := build/xprint.o  #$(ASM:.s=.o)
 
 #OBJ       = $(patsubst src/%.c,build/%.o,$(SRC))
 OBJ_A 	:= $(SRC:.c=.o)
@@ -55,7 +55,7 @@ INCLUDES += -I.
 
 
 
-all: checkdirs $(OBJ) $(TARGET) size
+all: checkdirs $(OBJ) $(ASM_OBJ) $(TARGET) size
 
 #-include $(DEP)
 
@@ -79,6 +79,13 @@ clean:
 
 # Build dir must be built in order to compile
 #$(ASM_OBJ): | $(BUILD_DIR)
+
+
+# Build ASM src files
+build/%.o: src/%.s
+#"CC " $< " > " $@
+	$(CC) $(INCLUDES) $(ASMFLAGS) -c $< -MD -o $@
+	@msp430-size $(patsubst src/%,build/%,$@)
 
 ec:
 	@echo $(OBJ)

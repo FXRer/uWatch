@@ -52,13 +52,13 @@ void buzzer_task(void)
 	event_wait(buzzerEvent);
 	
 	// configure timer B2
-	TB2CCR0 = 350;
+	TB2CCR0 = 650;
 	TB2CTL = TASSEL_2 + MC_3 + TACLR;
 	
 	TB2CCTL0 = OUTMOD_4; 
 	
 	// timeout?
-	task_wait(1);
+	task_wait(20);
 	
 	
 	// clean up, disabling timer will save power

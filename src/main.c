@@ -34,8 +34,12 @@
  
  #include "cocoOS/cocoos.h" // include cocoOS
  #include "drivers/clock.h"
+ #include "drivers/lcd.h"
  #include "drivers/hardware.h"
  #include "tasks/tasks.h"
+ #include "xprint.h"
+ 
+ 
  //#include "tasks/buttons.h"
  //#include "tasks/buzzer.h"
 
@@ -46,7 +50,7 @@
 	 {
 	 	PJOUT ^= BIT0;
 	 	event_wait(buttonEvent);
-	 	//event_signal(buzzerEvent);
+	 	event_signal(buzzerEvent);
 	 }
 	 task_close();
  }
@@ -86,41 +90,49 @@ CSCTL0 = 0xA500;
   CSCTL2 = SELA_0 + SELS_3 + SELM_3;        // set ACLK = MCLK = DCO
   CSCTL3 = DIVA_0 + DIVS_0 + DIVM_0;        // set all dividers 
 
-P2DIR |= BIT7 | LCD_EXTC | LCD_CLK;
-P1DIR |= LCD_DISP | LCD_DAT;
+P2DIR = BIT7 | LCD_EXTC | LCD_CLK;
+P1DIR = LCD_DISP | LCD_DAT;
 
 
 	UCB0CTLW0 = UCSWRST;
-	UCB0CTLW0 |= UCSYNC + UCCKPH + UCMSB + UCMST + UCSSEL_2;
+	UCB0CTLW0 = UCSYNC + UCCKPH + UCMSB + UCMST + UCSSEL_2 + UCSWRST;
 	//UCA0CTL1 = UCSWRST + UCSSEL_2;
-	UCB0BRW = 16<<2; // 8Mhz SCLK, 1MHz SCLK for LCD as specified in datasheet. 
+	UCB0BRW = 8<<2; // 8Mhz SCLK, 1MHz SCLK for LCD as specified in datasheet. 
 	//Tests have confirmed this runs at 2MHz, but we don't need that speed.
+
 
 	P2SEL1 |= LCD_CLK;// + MISO + MOSI + BIT1;
 	P1SEL1 |= LCD_DAT;
 
-	//P1SEL0 = BIT1 | BUZZER;
+	P2SEL0 = 0;
+	P1SEL0 = 0;//BIT1 | BUZZER;
 
-	UCA0CTLW0 &= ~UCSWRST;
+	UCB0CTLW0 &= ~UCSWRST;
 
 	P1OUT |= LCD_DISP;
 
+	clearBuff();
 
+	out_dev(&putc);
 
+	setxy(2,2);
+	xprint("Hello World");
+	//putc('e');
+	
 
  	os_init();
  	
  	// init events
  	buttonEvent = event_create();
- 	//buzzerEvent = event_create();
+ 	buzzerEvent = event_create();
  	
  	
  	// init tasks
  	task_create( simple_task, 20 , 0, 0, 0);
  	task_create( simple_task_A, 100 , 0, 0, 0);
  //	task_create( manager_task, 200, 0 , 0 ,0 );
- 	task_create( home_task, 101,0,0,0);
- //	task_create( buzzer_task, 5, 0, 0, 0);
+ 	task_create( analog_task, 101,0,0,0);
+ 	task_create( buzzer_task, 5, 0, 0, 0);
  	task_create( button_task, 2, 0, 0, 0);
  	
  	// start timer
