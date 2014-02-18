@@ -55,23 +55,7 @@
 	 task_close();
  }
  
-  static void simple_task_A(void)
- {
-	 task_open();
-	 static int i;
-	 while(1)
-	 {
-	 	if(i > 19)
-	 	{
-	 		PJOUT ^= BIT1;
-	 		//event_signal(buzzerEvent);
-	 		i = 0;
-	 	}
-	 	i++;
-	 	task_wait(1);
-	 }
-	 task_close();
- }
+
  
  int main(void)
  {	
@@ -128,10 +112,11 @@ P1DIR = LCD_DISP | LCD_DAT;
  	
  	
  	// init tasks
+ task_create( home_task, 100, 0, 0, 0);
  	task_create( simple_task, 20 , 0, 0, 0);
- 	task_create( simple_task_A, 100 , 0, 0, 0);
+ //	task_create( simple_task_A, 100 , 0, 0, 0);
  //	task_create( manager_task, 200, 0 , 0 ,0 );
- 	task_create( analog_task, 101,0,0,0);
+ //	task_create( analog_task, 101,0,0,0);
  	task_create( buzzer_task, 5, 0, 0, 0);
  	task_create( button_task, 2, 0, 0, 0);
  	

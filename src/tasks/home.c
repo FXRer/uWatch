@@ -34,57 +34,82 @@
  
 #include <msp430.h> 
 #include "home.h"
+#include "buttons.h"
+#include "tasks.h"
 #include "../drivers/lcd.h"
 #include "../xprint.h"
 
+struct menu {
+	char *image;
+	char name[10];
+	taskproctype task;
+	
+};
 
-const signed char tab[] = {0x28,0x27,0x27,0x26,0x24,0x22,0x20,0x1D,
-0x1A,0x17,0x14,0x10,0x0C,0x08,0x04,0x00,
-0xFC,0xF8,0xF4,0xF0,0xED,0xE9,0xE6,0xE3,
-0xE0,0xDE,0xDC,0xDA,0xD9,0xD9,0xD9,0xD9,
-0xD9,0xDA,0xDC,0xDE,0xE0,0xE3,0xE6,0xE9,
-0xEC,0xF0,0xF4,0xF8,0xFC,0x00,0x04,0x08,
-0x0C,0x10,0x13,0x17,0x1A,0x1D,0x20,0x22,
-0x24,0x26,0x27,0x27};
 
-static int hour,minute;
+#define BUTTON_UP 8
+#define BUTTON_DOWN 2
+#define BUTTON_SELECT 3
+#define BUTTON_MENU 4
+
+struct menu mainMenu[3] = {
+{0,"Analog",analog_task},
+{0,"Taskman",manager_task},
+{0,"Analog_A",analog_task},
+
+};
+
+#define N_MENU (sizeof(mainMenu)/sizeof(struct menu))
+
+int current_menu_item, current_tid;
+
 
 void home_task(void)
 {
 
 	task_open();
-	//c = 0;
+	current_menu_item = 0;
+	current_tid = 0;
 	while(1)
 	{
+		
+		if( current_tid  == 0)
+		{
 		clearBuff();
+		
+		
 		setxy(2,4);
-		
-		xprint("%02u:%02u",hour,minute); 
-		
-		plotCircle(48,48,44);
-		
-		plotLine(48, 48, 48-tab[minute], 48 + tab[(15+minute)%60]);
-		
-		
-		plotLine(48, 48, 48-(tab[hour*5+ minute/12]>>1), 48 + (tab[(15+hour*5 + minute/12)%60]>>1));
-		
+		xprint("%s",mainMenu[current_menu_item].name); 
 		
 		lcd_xmit();
-		//PJOUT ^= BIT0;
 		
-		
-		task_wait(100);
-		
-		
-		if(++minute > 59)
-		{
-			minute = 0;
-			if(++hour > 12)
-			{
-				hour  = 0; 
-			}
 		}
+		event_wait( buttonEvent );
 		
+		char button_state = button_get_pressed();
+		if(( button_state & BUTTON_DOWN )&&( current_menu_item > 0 ))
+		{
+			current_menu_item--; 
+			// antmation?
+		}
+		else if(( button_state & BUTTON_UP )&&( current_menu_item < N_MENU ))
+		{
+			
+		}
+		else if(( button_state & BUTTON_SELECT )&&( current_tid == 0 )) // no task running
+		{
+			// call up a new task
+			task_create( mainMenu[current_menu_item].task, 30, 0, 0, 0 ); // should be a lower priority than this task
+			
+			// store tid
+			current_tid = task_id_get( mainMenu[current_menu_item].task );
+			
+		}
+		else if(( button_state & BUTTON_MENU )&&( current_tid != 0 ))
+		{
+			task_kill( mainMenu[current_menu_item].task );
+			current_tid = 0;
+		}
 			//P2OUT ^= BIT3;
 	}
 	
