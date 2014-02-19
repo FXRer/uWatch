@@ -47,10 +47,10 @@ struct menu {
 };
 
 
-#define BUTTON_UP 8
-#define BUTTON_DOWN 2
-#define BUTTON_SELECT 3
-#define BUTTON_MENU 4
+#define BUTTON_UP 0x80
+#define BUTTON_DOWN 0x20
+#define BUTTON_SELECT 0x40
+#define BUTTON_MENU 0x08
 
 struct menu mainMenu[3] = {
 {0,"Analog",analog_task},
@@ -68,7 +68,7 @@ void home_task(void)
 {
 
 	task_open();
-	current_menu_item = 0;
+	current_menu_item = 1;
 	current_tid = 0;
 	while(1)
 	{
@@ -79,7 +79,7 @@ void home_task(void)
 		
 		
 		setxy(2,4);
-		xprint("%s",mainMenu[current_menu_item].name); 
+		xprint("%s\n0x%04X",mainMenu[current_menu_item].name,mainMenu[current_menu_item].task ); 
 		
 		lcd_xmit();
 		
@@ -92,17 +92,18 @@ void home_task(void)
 			current_menu_item--; 
 			// antmation?
 		}
-		else if(( button_state & BUTTON_UP )&&( current_menu_item < N_MENU ))
+		else if(( button_state & BUTTON_UP )&&( current_menu_item < N_MENU -1 ))
 		{
-			
+			current_menu_item++;
 		}
 		else if(( button_state & BUTTON_SELECT )&&( current_tid == 0 )) // no task running
 		{
 			// call up a new task
-			task_create( mainMenu[current_menu_item].task, 30, 0, 0, 0 ); // should be a lower priority than this task
+			
+			task_create( mainMenu[current_menu_item].task, 10, 0, 0, 0 ); // should be a lower priority than this task
 			
 			// store tid
-			current_tid = task_id_get( mainMenu[current_menu_item].task );
+			current_tid = 1;//task_id_get( mainMenu[current_menu_item].task );
 			
 		}
 		else if(( button_state & BUTTON_MENU )&&( current_tid != 0 ))
@@ -110,6 +111,7 @@ void home_task(void)
 			task_kill( mainMenu[current_menu_item].task );
 			current_tid = 0;
 		}
+		task_wait(10);
 			//P2OUT ^= BIT3;
 	}
 	

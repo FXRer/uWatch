@@ -112,7 +112,7 @@ P1DIR = LCD_DISP | LCD_DAT;
  	
  	
  	// init tasks
- task_create( home_task, 100, 0, 0, 0);
+ 	task_create( home_task, 100, 0, 0, 0);
  	task_create( simple_task, 20 , 0, 0, 0);
  //	task_create( simple_task_A, 100 , 0, 0, 0);
  //	task_create( manager_task, 200, 0 , 0 ,0 );

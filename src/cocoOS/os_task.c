@@ -180,25 +180,33 @@ int main(void) {
 */
 /*********************************************************************************/
 uint8_t task_create( taskproctype taskproc, uint8_t prio, Msg_t *msgPool, uint8_t poolSize, uint16_t msgSize ) {
-    uint8_t taskId;
+    uint8_t taskId,newTaskId;
     tcb *task;
 
-    os_assert( os_running() == 0 );
+    //os_assert( os_running() == 0 );
     os_assert( nTasks < N_TASKS );
     os_assert( taskproc != NULL );
 
     taskId = nTasks;
+    newTaskId = nTasks;
 
     /* Check that no other task has the same prio */
     while ( taskId != 0 ) {
         --taskId;
-        os_assert( task_list[ taskId ].prio != prio );
+        if( task_list[ taskId ].state != KILLED )
+        {
+        	os_assert( task_list[ taskId ].prio != prio );
+        }
+        else
+        {
+        	newTaskId = taskId; // take ID from killed task
+        }
     } 
     
     
-    task = &task_list[ nTasks ];
+    task = &task_list[ newTaskId ];
 
-    task->tid = nTasks;
+    task->tid = newTaskId;
     task->prio = prio;
     task->state = READY;
     task->savedState = READY;
@@ -214,7 +222,7 @@ uint8_t task_create( taskproctype taskproc, uint8_t prio, Msg_t *msgPool, uint8_
         task->msgQ = NO_QUEUE;
     }
 
-    os_task_clear_wait_queue( nTasks );
+  	os_task_clear_wait_queue( nTasks );
     
     nTasks++;
     return task->tid;
