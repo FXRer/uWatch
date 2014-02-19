@@ -87,29 +87,35 @@ void home_task(void)
 		event_wait( buttonEvent );
 		
 		char button_state = button_get_pressed();
-		if(( button_state & BUTTON_DOWN )&&( current_menu_item > 0 ))
+		if(current_tid == 0)
 		{
-			current_menu_item--; 
-			// antmation?
-		}
-		else if(( button_state & BUTTON_UP )&&( current_menu_item < N_MENU -1 ))
-		{
-			current_menu_item++;
-		}
-		else if(( button_state & BUTTON_SELECT )&&( current_tid == 0 )) // no task running
-		{
-			// call up a new task
+			if(( button_state & BUTTON_DOWN )&&( current_menu_item > 0 ))
+			{
+				current_menu_item--; 
+				// antmation?
+			}
+			else if(( button_state & BUTTON_UP )&&( current_menu_item < N_MENU -1 ))
+			{
+				current_menu_item++;
+			}
+			else if(( button_state & BUTTON_SELECT )) // no task running
+			{
+				// call up a new task
 			
-			task_create( mainMenu[current_menu_item].task, 10, 0, 0, 0 ); // should be a lower priority than this task
+				task_create( mainMenu[current_menu_item].task, 10, 0, 0, 0 ); // should be a lower priority than this task
 			
-			// store tid
-			current_tid = 1;//task_id_get( mainMenu[current_menu_item].task );
+				// store tid
+				current_tid = 1;//task_id_get( mainMenu[current_menu_item].task );
 			
+			}
 		}
-		else if(( button_state & BUTTON_MENU )&&( current_tid != 0 ))
+		else
+		{ 
+		if(( button_state & BUTTON_MENU ))
 		{
 			task_kill( mainMenu[current_menu_item].task );
 			current_tid = 0;
+		}
 		}
 		task_wait(10);
 			//P2OUT ^= BIT3;

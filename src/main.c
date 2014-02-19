@@ -55,6 +55,20 @@
 	 task_close();
  }
  
+ 
+ // lcd_EXTC task 
+ // TODO implement in hardware with timer.
+  static void lcd_extc_task(void)
+ {
+	 task_open();
+	 while(1)
+	 {
+	 	P2OUT ^= LCD_EXTC;
+	 	task_wait(1000);
+	 }
+	 task_close();
+ }
+ 
 
  
  int main(void)
@@ -119,6 +133,7 @@ P1DIR = LCD_DISP | LCD_DAT;
  //	task_create( analog_task, 101,0,0,0);
  	task_create( buzzer_task, 5, 0, 0, 0);
  	task_create( button_task, 2, 0, 0, 0);
+ 	task_create( lcd_extc_task, 12, 0,0,0);
  	
  	// start timer
  	clock_init();

@@ -222,9 +222,11 @@ uint8_t task_create( taskproctype taskproc, uint8_t prio, Msg_t *msgPool, uint8_
         task->msgQ = NO_QUEUE;
     }
 
-  	os_task_clear_wait_queue( nTasks );
+  	os_task_clear_wait_queue( newTaskId );
     
-    nTasks++;
+    if(newTaskId == nTasks)
+    	nTasks++; // check if we've taken a new slot or an old one.
+    	
     return task->tid;
 }
 
@@ -801,6 +803,6 @@ static void task_killed_set( uint8_t tid ) {
     task_list[ tid ].state = KILLED;
 }
 
-tcb** task_get_list(void){
-	return task_list;
+char* task_get_list(uint8_t tid){
+	return &task_list[ tid ];
 }

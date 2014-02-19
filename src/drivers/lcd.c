@@ -75,8 +75,6 @@ void lcd_xmit(void)
 	
 	UCB0TXBUF = 0x80; // start DMA xfer
 	
-	P2OUT ^= LCD_EXTC;
-	
 	while((DMAIFG & DMA0CTL) == 0);
 	
 	

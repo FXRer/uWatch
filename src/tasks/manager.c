@@ -38,28 +38,45 @@
 
 // desc, a simple task manager. is infact a task in itself. 
 
+//extern tcb task_list[ N_TASKS ];
+char* tasks;
+
 
 void manager_task(void)
 {
-	int i;
+	int i,j;
 	static int selected;
 	task_open();
 	selected = 0;
+	clearBuff();
 	while(1)
 	{
 		// get list of running tasks
+		tasks =  task_get_list( 0 );
 		
-		tcb** tasks = task_get_list();
 		// small preamble
-		setxy(1,1);
+		setxy(0,0);
 		xprint(" Tid  prio  time\n");
 		
-		// display the list
-		for(i = 0; i < 4; i++)
-		{
-			tcb *t = tasks[i]; // do something with this information
 		
-			xprint("%c%u %u %04X\n",selected == i ? '>' : '-',t,0,0);
+		char *t = &tasks[0]; // do something with this information
+		
+		
+		// display the list
+		for(i = 0; i < 7; i++)
+		{
+			
+			t = &tasks[20*i];
+			
+			
+			for(j = 0; j < 8; j++)
+			{
+				xprint("%02X ", *t & 0xFF);
+				t++;
+			}  
+			putc('\n');
+			//xprint("\n");
+			//xprint("%c%u %u %04X\n",selected == i ? '>' : '-',t[0],0,0);
 			
 		}
 		
@@ -68,9 +85,9 @@ void manager_task(void)
 		lcd_xmit();
 		
 		// take input of some kind
-		event_wait( buttonEvent );
-		
-		selected++;
+		//event_wait( buttonEvent );
+		task_wait(10);
+		//selected++;
 	}
 	
 	task_close();
