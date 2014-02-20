@@ -70,7 +70,7 @@ void lcd_xmit(void)
 	__asm__("mov.w	%1,%0": "=m" (DMA0SA) :"i" (_buffer));
 	__asm__("mov.w	%1,%0": "=m" (DMA0DA) :"i" (&UCB0TXBUF));
 	
-	DMA0SZ = (96*14)+1;
+	DMA0SZ = (97*14)+1;
 	DMA0CTL = DMADT_4|DMASRCINCR_3|DMADSTBYTE|DMASRCBYTE|DMAEN;
 	
 	UCB0TXBUF = 0x80; // start DMA xfer

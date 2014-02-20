@@ -56,7 +56,7 @@ void manager_task(void)
 		
 		// small preamble
 		setxy(0,0);
-		xprint(" Tid  prio  time\n");
+		xprint(" id Prio time\n");
 		
 		
 		char *t = &tasks[0]; // do something with this information
@@ -69,11 +69,11 @@ void manager_task(void)
 			t = &tasks[20*i];
 			
 			
-			for(j = 0; j < 8; j++)
-			{
-				xprint("%02X ", *t & 0xFF);
+		//	for(j = 0; j < 8; j++)
+			//{
+				xprint("%c%02X  %03d %04X %04X",selected == i ? '>' : '~', *t & 0xFF, t[1], t[14], t[18]);
 				t++;
-			}  
+			//}  
 			putc('\n');
 			//xprint("\n");
 			//xprint("%c%u %u %04X\n",selected == i ? '>' : '-',t[0],0,0);
@@ -84,9 +84,18 @@ void manager_task(void)
 		// display this result.
 		lcd_xmit();
 		
+		
+		
 		// take input of some kind
-		//event_wait( buttonEvent );
-		task_wait(10);
+		event_wait_timeout( buttonEvent , 10 );
+		
+		switch( button_get_pressed() )
+		{
+			case 0x20 :
+				selected++;
+			break;
+		}
+		//task_wait(10);
 		//selected++;
 	}
 	

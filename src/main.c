@@ -64,7 +64,7 @@
 	 while(1)
 	 {
 	 	P2OUT ^= LCD_EXTC;
-	 	task_wait(1000);
+	 	task_wait(100);
 	 }
 	 task_close();
  }
@@ -131,7 +131,7 @@ P1DIR = LCD_DISP | LCD_DAT;
  //	task_create( simple_task_A, 100 , 0, 0, 0);
  //	task_create( manager_task, 200, 0 , 0 ,0 );
  //	task_create( analog_task, 101,0,0,0);
- 	task_create( buzzer_task, 5, 0, 0, 0);
+ //	task_create( buzzer_task, 5, 0, 0, 0);
  	task_create( button_task, 2, 0, 0, 0);
  	task_create( lcd_extc_task, 12, 0,0,0);
  	
